@@ -1,0 +1,321 @@
+#include <iostream>
+#include <locale>
+#include <time.h>
+#define INF 1000000000
+//Создание неориентированного графа через матрицу смежности
+void neormatrix(int** arr, int count, int vibor)
+{
+	int w, t, k = 0;
+	if (vibor == 1)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			for (int j = i; j < count; j++)
+			{
+				w = rand() % 2;
+				if (w == 1)
+				{
+					arr[i][j] = rand() % 10;
+					arr[j][i] = arr[i][j];
+				}
+				else {
+					arr[i][j] = 0;
+					arr[j][i] = arr[i][j];
+				}
+				if (i == j)
+				{
+					arr[i][j] = 0;
+				}
+			}
+		}
+	}
+
+	if (vibor == 2)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			for (int j = i; j < count; j++)
+			{
+				w = rand() % 2;
+				if (w == 1)
+				{
+					t = rand() % 2;
+					if (t == 1)
+					{
+						arr[i][j] = rand() % 10;
+						arr[j][i] = arr[i][j];
+					}
+					else
+						arr[i][j] = rand() % 10 - 5;
+					arr[j][i] = arr[i][j];
+				}
+				else {
+					arr[i][j] = 0;
+					arr[j][i] = arr[i][j];
+				}
+				if (i == j)
+				{
+					arr[i][j] = 0;
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < count; j++)
+		{
+			printf(" %d", arr[i][j]);
+		}
+		printf("\n");
+	}
+}
+//Создание ориентированного графа через матрицу смежности
+void ormatrix(int** arr, int count,int vibor)
+{
+	int w, t, k = 0;
+	if (vibor == 1)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			for (int j = i; j < count; j++)
+			{
+				w = rand() % 2;
+				if (w == 1)
+				{
+					t = rand() % 2;
+					if (t == 1)
+					{
+						arr[i][j] = rand() % 10;
+						arr[j][i] = rand() % 10;
+					}
+					else
+						arr[i][j] = rand() % 10;
+					arr[j][i] = rand() % 10;
+				}
+				else {
+					arr[i][j] = 0;
+					arr[j][i] = arr[i][j];
+				}
+				if (i == j)
+				{
+					arr[i][j] = 0;
+				}
+			}
+		}
+	}
+
+	if (vibor == 2)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			for (int j = i; j < count; j++)
+			{
+				w = rand() % 2;
+				if (w == 1)
+				{
+					t = rand() % 2;
+					if (t == 1)
+					{
+						arr[i][j] = rand() % 10;
+						arr[j][i] = rand() % 10;
+					}
+					else
+						arr[i][j] = rand() % 10 - 5;
+					arr[j][i] = rand() % 10 - 5;
+				}
+				else {
+					arr[i][j] = 0;
+					arr[j][i] = arr[i][j];
+				}
+				if (i == j)
+				{
+					arr[i][j] = 0;
+				}
+			}
+		}
+	}
+	
+
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < count; j++)
+		{
+			printf(" %d", arr[i][j]);
+		}
+		printf("\n");
+	}
+}
+//Вывод алгоритма
+void output(int count, int** result, int apex)
+{
+	int i, j;
+	printf("Форд-Баллман:\n");
+
+	for (j = 0; j < count; j++)
+	{
+		//если путь есть
+		if (result[count - 1][j] < 10000)
+		{
+			printf("Минимальное расстояние между вершинами %d и %d = %d\n", apex + 1, j + 1, result[count - 1][j]);
+		}
+		else
+			printf("Минимальное расстояние между вершинами %d и %d = INF\n", apex + 1, j + 1);
+
+	}
+	printf("\n");
+	for (i = 0; i < count; i++)
+	{
+		for (j = 0; j < count; j++)
+		{
+			printf(" %d", result[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+//Алгоритм Форда-Беллмана
+void Ford_Ballman(int CountApex, int** SourceMatrix, int Start)
+{
+	int** MinPath; // массив кратчайших путей
+	int i, j, k;
+	int count = 0;
+	MinPath = (int**)malloc(CountApex * sizeof(int*));
+	for (int i = 0; i < CountApex; i++)
+	{
+		MinPath[i] = (int*)malloc(CountApex * sizeof(int));
+	}
+
+	for (i = 0; i < CountApex; i++)
+	{
+		MinPath[0][i] = INF; //изначально кратчайшие пути неизвестны
+	}
+
+	MinPath[0][Start] = 0;
+	for (k = 1; k < CountApex; k++)
+	{
+		for (i = 0; i < CountApex; i++)
+		{
+			MinPath[k][i] = MinPath[k - 1][i];
+			for (j = 0; j < CountApex; j++)
+			{
+				if (SourceMatrix[j][i] != 0)
+					if ((MinPath[k - 1][j] != INF) && (MinPath[k - 1][j] + SourceMatrix[j][i] < MinPath[k][i]))
+					{
+						MinPath[k][i] = MinPath[k - 1][j] + SourceMatrix[j][i];
+					}
+			}
+		}
+	}
+	output(CountApex, MinPath, Start);
+}
+
+int main()
+{
+	setlocale(LC_ALL, "Rus");
+	int** a, n, k = 0, begin = 0,u;
+	float start, end;
+	FILE *in;
+	char filename[20];
+
+	while (begin != 4)
+	{
+		printf("1.Создать неориентированный граф\n2.Создать ориентированный граф\n3.Считать граф из файла\n4.Выйти из программы\n");
+		printf("\nВаш выбор: ");
+		scanf_s("%d", &begin);
+		if (begin == 1)
+		{
+			printf("1.Создать граф без наличия отрицательных ребер\n2.Создать граф с наличием отрицаетльных ребер\n");
+			scanf_s("%d", &u);
+			printf("Введите кол-во строк и столбцов\n");
+			scanf_s("%d", &n);
+			a = (int**)malloc(n * sizeof(int*));
+			for (int i = 0; i < n; i++)
+			{
+				a[i] = (int*)malloc(n * sizeof(int));
+			}
+			neormatrix(a, n,u);
+			printf("Введите вершину: ");
+			scanf_s("%d", &k);
+			k = k - 1;
+
+			start = clock();
+			Ford_Ballman(n, a, k);
+			end = clock();
+			printf("Алгоритм использовал %.10f секунд.\n", (end - start) / (CLOCKS_PER_SEC));
+			free(a);
+			system("pause");
+		}
+		if (begin == 2)
+		{
+			printf("1.Создать граф без наличия отрицательных ребер\n2.Создать граф с наличием отрицаетльных ребер\n");
+			scanf_s("%d", &u);
+			printf("Введите кол-во строк и столбцов\n");
+			scanf_s("%d", &n);
+			a = (int**)malloc(n * sizeof(int*));
+			for (int i = 0; i < n; i++)
+			{
+				a[i] = (int*)malloc(n * sizeof(int));
+			}
+			ormatrix(a, n,u);
+			printf("Введите вершину: ");
+			scanf_s("%d", &k);
+			k = k - 1;
+
+			start = clock();
+			Ford_Ballman(n, a, k);
+			end = clock();
+			printf("Алгоритм использовал %.10f секунд.\n", (end - start) / (CLOCKS_PER_SEC));
+			free(a);
+			system("pause");
+		}
+		if (begin == 3)
+		{
+			printf("Введите название файла: ");
+			scanf_s("%s", filename, 20);
+			fopen_s(&in, filename, "r");
+
+			if (!in)
+				printf("Ошибка! Файл не прочитан\n");
+			else
+				printf("Читаем граф...");
+			fscanf_s(in, "%d", &n);
+			a = (int**)malloc(n * sizeof(int*));
+			for (int i = 0; i < n; i++)
+			{
+				a[i] = (int*)malloc(n * sizeof(int));
+			}
+
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					fscanf_s(in, "%d", &a[i][j]);
+				}
+			}
+			fclose(in);
+			printf("Граф считан\n");
+
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					printf(" %d", a[i][j]);
+				}
+				printf("\n");
+			}
+			printf("Введите вершину: ");
+			scanf_s("%d", &k);
+			k = k - 1;
+
+			start = clock();
+			Ford_Ballman(n, a, k);
+			end = clock();
+			printf("Алгоритм использовал %.10f секунд.\n", (end - start) / (CLOCKS_PER_SEC));
+			free(a);
+			system("pause");
+		}
+	}
+	getchar();
+	getchar();
+}
